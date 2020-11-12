@@ -7,7 +7,7 @@ class Solution(object):
         """
         result_lists = []
         for i in range(numRows):
-            result_lists.append(list())
+            result_lists.append("")
         direct = True
         index = -1
         for i in range(len(s)):
@@ -19,10 +19,10 @@ class Solution(object):
                 index -= 1
                 if index == 0:
                     direct = True
-            result_lists[index].append(s[i])
+            result_lists[index] += s[i]
         result_str = ""
         for elem in result_lists:
-            result_str+="".join(elem)
+            result_str += elem
         return result_str
 
 
