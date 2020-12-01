@@ -5,8 +5,8 @@ class Solution(object):
         return self.letterCombinationsIter(digits, len(digits)-1)
 
     def letterCombinationsIter(self, digits, end_index: int) -> list:
-        if end_index == 0:
-            return Solution.getLetter(int(digits[0]))
+        if end_index < 0:
+            return ['']
         else:
             num = int(digits[end_index])
             letters = Solution.getLetter(num)
