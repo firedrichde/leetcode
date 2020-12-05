@@ -29,7 +29,7 @@ class Solution(object):
                     grid_border_j = self.getGridborder(j, grid_len)
                     for grid_i in range(grid_border_i-grid_len, grid_border_i):
                         for grid_j in range(grid_border_j-grid_len, grid_border_j):
-                            if grid_i == i and grid_j == j:
+                            if grid_i <= i and grid_j <= j:
                                 continue
                             if board[grid_i][grid_j] == elem:
                                 return False
