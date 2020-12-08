@@ -2,6 +2,7 @@ class Solution(object):
     class RepeatedSet(object):
         def __init__(self, letters):
             self.symbols = {}
+            self.letters = letters
             for elem in letters:
                 if elem in self.symbols.keys():
                     self.symbols[elem] += 1
@@ -9,7 +10,7 @@ class Solution(object):
                     self.symbols[elem] = 1
 
         def equals(self, rs):
-            return self.symbols == rs.symbols
+            return len(self.letters)==len(rs.letters) and self.symbols == rs.symbols
 
     def groupAnagrams(self, strs: list) -> list:
         """Given an array of strings strs, group the
@@ -18,10 +19,19 @@ class Solution(object):
         a different word or phrase, typically using all the original
         letters exactly once.
         """
-        result_group = self.groupAnagrams0(strs, 0, len(strs)-1)
+        strs_groups_by_len = {}
+
+        for elem in strs:
+            if len(elem) in strs_groups_by_len:
+                strs_groups_by_len[len(elem)].append(elem)
+            else:
+                strs_groups_by_len[len(elem)] = list()
+                strs_groups_by_len[len(elem)].append(elem)
         results = []
-        for key in result_group.keys():
-            results.append(result_group[key])
+        for l in strs_groups_by_len.keys():
+            result_group = self.groupAnagrams0(strs_groups_by_len[l], 0, len(strs_groups_by_len[l])-1)
+            for key in result_group.keys():
+                results.append(result_group[key])
         return results
 
     def groupAnagrams0(self, strs: list, low, high) -> dict:
@@ -50,8 +60,14 @@ class Solution(object):
         for right_key in right_groups.keys():
             key_match = self.contains(left_groups, right_key)
             if key_match is not None:
-                for elem in right_groups[right_key]:
-                    left_groups[key_match].append(elem)
+                if len(left_groups[key_match])>len(right_groups[right_key]):
+                    for elem in right_groups[right_key]:
+                        left_groups[key_match].append(elem)
+                else:
+                    tmp = left_groups[key_match]
+                    left_groups[key_match] = right_groups[right_key]
+                    for elem in tmp:
+                        left_groups[key_match].append(elem)
             else:
                 left_groups[right_key] = right_groups[right_key]
         return left_groups
