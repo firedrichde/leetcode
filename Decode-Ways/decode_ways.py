@@ -3,46 +3,67 @@ class Solution(object):
     From: https://leetcode.com/problems/decode-ways/
     """
 
-    def numDecodings(self, s: str) -> int:
-        return self.numDecodings0(s, 0, len(s)-1)
+    def __init__(self):
+        self.map = {}
+        self.valid = True
 
-    def numDecodings0(self, s: str, low: int, high: int) -> int:
-        if low>high:
-            return 1
-        elif low == high:
-            # no character is mapping to number 0
-            if s[low] == '0':
-                return 0
-            else:
-                return 1
+    def numDecodings(self, s: str) -> int:
+        self.check(s)
+        if self.valid:
+            num = self.decodeWay(s, 0)
+            return num
         else:
-            # 'j' is mapping to number 10,'t' is mapping to number 20
-            if high-low == 1 and (s[low] == '0' or s[high] == '0'):
-                if s[low] == '0' and s[high] == '0':
-                    return 0
-                else:
-                    return 1
+            return 0
+
+    def decodeWay(self, s: str, index: int) -> bool:
+        if index in self.map.keys():
+            return self.map[index]
+        length = len(s)
+        # if index reach the lengh, means the way of decoding is right
+        if index == length:
+            return 1
+        # first way of decoding,only decode the single num
+        first_decode_way = self.decode(s[index])
+        # second way of decoding,decode two nums
+        second_decode_way = index + 1 < length and self.decode(s[index:index+2])
+        num = 0
+        if first_decode_way:
+            num += self.decodeWay(s, index+1)
+        if second_decode_way:
+            num += self.decodeWay(s, index+2)
+        self.map[index] = num 
+        return num
+
+    def decode(self, num_str: str) -> bool:
+        length = len(num_str)
+        if length == 1:
+            value = int(num_str)
+            if value > 0:
+                return True
             else:
-                mid = (low+high)//2
-                # '10' or '20' will be separate on divide operation
-                if mid+1 < len(s) and s[mid+1] == '0':
-                    mid_decoding_num = self.numDecodings0(s, mid, mid+1)
-                    left_decoding_num = self.numDecodings0(s, low, mid-1)
-                    right_decoding_num = self.numDecodings0(s, mid+2, high)
-                    num = left_decoding_num * right_decoding_num * mid_decoding_num
-                    return num
-                else:
-                    left_decoding_num = self.numDecodings0(s, low, mid)
-                    right_decoding_num = self.numDecodings0(s, mid+1, high)
-                    num = left_decoding_num*right_decoding_num
-                    left_edge_char = s[mid]
-                    right_edge_char = s[mid+1]
-                    mid_coding = int(left_edge_char+right_edge_char)
-                    # if the mid num can be
-                    # decoded,increase the ways
-                    if mid_coding >= 11 and mid_coding <= 26:
-                        num += 1
-                    return num
+                return False
+        elif length == 2:
+            high_bit_num = int(num_str[0])
+            low_bit_num = int(num_str[1])
+            if high_bit_num == 1:
+                return True
+            elif high_bit_num == 2:
+                return low_bit_num <= 6
+            else:
+                return False
+
+    # if the coding is valid,set valid flag true,else set false
+
+    def check(self, s: str) -> None:
+        if s.startswith('0'):
+            self.valid = False
+        else:
+            for i in range(1, len(s)):
+                value = int(s[i])
+                pre_value = int(s[i-1])
+                if value == 0 and pre_value != 1 and pre_value != 2:
+                    self.valid = False
+            self.valid = True
 
 
 if __name__ == "__main__":
